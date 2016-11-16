@@ -40,13 +40,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
     install -c /go/bin/* /usr/bin/ && \
     rm -rf /go/* && \
-    chmod +x \
-        /usr/lib/protoc-gen-swift-lib/libicudata.so.55 && \
-    upx -9 \
-        /usr/bin/protoc-gen-* \
-        /usr/lib/protoc-gen-swift-lib/libFoundation.so \
-        /usr/lib/protoc-gen-swift-lib/libswiftCore.so \
-        /usr/lib/protoc-gen-swift-lib/libicudata.so.55 && \
+    upx --lzma --best /usr/bin/protoc-gen-* && \
     mkdir -p /protobuf/google/protobuf && \
         for f in any duration descriptor empty struct timestamp wrappers; do \
             curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
