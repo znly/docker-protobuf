@@ -6,7 +6,6 @@ ENV GRPC_VERSION=1.0.1      \
     SWIFT_PROTOBUF_VERSION=0.9.24  \
     GOPATH=/go
 
-COPY upx /usr/bin/upx
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
     curl -L https://github.com/QuentinPerez/docker-alpine-swift-protobuf/releases/download/$SWIFT_PROTOBUF_VERSION/export-lib-bcd56c4.tar | tar xv -C / && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz && \
@@ -40,7 +39,6 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
     install -c /go/bin/* /usr/bin/ && \
     rm -rf /go/* && \
-    upx --lzma --best /usr/bin/protoc-gen-* && \
     mkdir -p /protobuf/google/protobuf && \
         for f in any duration descriptor empty struct timestamp wrappers; do \
             curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
