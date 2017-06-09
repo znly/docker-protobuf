@@ -2,7 +2,7 @@ FROM alpine:3.4
 MAINTAINER Steeve Morin <steeve@zen.ly>
 
 ENV GRPC_VERSION=1.0.1              \
-    PROTOBUF_VERSION=3.1.0          \
+    PROTOBUF_VERSION=3.3.0          \
     SWIFT_PROTOBUF_VERSION=0.9.24   \
     GOPATH=/go
 
