@@ -4,11 +4,12 @@ MAINTAINER Steeve Morin <steeve@zen.ly>
 ENV GRPC_VERSION=1.4.1              \
     GRPC_JAVA_VERSION=1.4.0         \
     PROTOBUF_VERSION=3.3.2          \
-    SWIFT_PROTOBUF_VERSION=0.9.24   \
+    PROTOBUF_C_VERSION=1.2.1        \
+    PROTOBUF_SWIFT_VERSION=0.9.24   \
     GOPATH=/go
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
-    curl -L https://github.com/QuentinPerez/docker-alpine-swift-protobuf/releases/download/$SWIFT_PROTOBUF_VERSION/export-lib-056f6f6.tar | tar xv -C / && \
+    curl -L https://github.com/QuentinPerez/docker-alpine-swift-protobuf/releases/download/${PROTOBUF_SWIFT_VERSION}/export-lib-056f6f6.tar | tar xv -C / && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz && \
     curl -L https://raw.githubusercontent.com/QuentinPerez/docker-alpine-swift-protobuf/master/ressources/ld_library_path.patch > /ld_library_path.patch && \
     cd /protobuf-${PROTOBUF_VERSION} && \
@@ -29,6 +30,11 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         g++ -I. *.cpp -lprotoc -lprotobuf -lpthread --std=c++0x -s -o protoc-gen-grpc-java && \
         install -c protoc-gen-grpc-java /usr/bin/ && \
         rm -rf /grpc-java-${GRPC_JAVA_VERSION} && cd / && \
+    curl -L https://github.com/protobuf-c/protobuf-c/releases/download/v${PROTOBUF_C_VERSION}/protobuf-c-${PROTOBUF_C_VERSION}.tar.gz | tar xvz && \
+    cd /protobuf-c-${PROTOBUF_C_VERSION} && \
+        ./configure --prefix=/usr && \
+        make && make install && \
+        rm -rf `pwd` && cd / && \
     go get -ldflags "-w -s" \
         github.com/golang/protobuf/protoc-gen-go \
         github.com/gogo/protobuf/protoc-gen-gofast \

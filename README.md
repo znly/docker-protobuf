@@ -16,6 +16,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
   - github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 ## Supported languages
+- C
 - C++
 - C#
 - Java / JavaNano (Android)
