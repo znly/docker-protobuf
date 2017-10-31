@@ -138,4 +138,14 @@ RUN apk add --no-cache curl && \
         curl -L -o /protobuf/github.com/gogo/protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del curl
 
-ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
+RUN apk add --no-cache python py2-pip python-dev gcc libc-dev g++ && \
+    pip install grpcio-tools                                      && \
+    apk del libc-dev g++ gcc python2-dev \
+            sqlite-libs readline ncurses-libs ncurses-terminfo \
+            ncurses-terminfo-base gdbm libffi expat libbz2     \
+            musl-dev mpc1 mpfr3 pkgconf libatomic libgomp isl  \
+            gmp binutils binutils-libs
+
+
+COPY "protoc-switch.sh" "/usr/local/bin/protoc-switch.sh"
+ENTRYPOINT ["/usr/local/bin/protoc-switch.sh"]
