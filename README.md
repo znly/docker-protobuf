@@ -2,8 +2,8 @@
 All inclusive protoc suite, powered by Docker and Alpine Linux.
 
 ## What's included:
-- protobuf 3.4.1
-- gRPC 1.6.1
+- protobuf 3.5.1
+- gRPC 1.8.3
 - Google Well Known Types are automatically included (via `google/`)
 - Go related tools compiled with 1.8.1, gRPC support is built-in:
   - github.com/golang/protobuf/protoc-gen-go
