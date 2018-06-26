@@ -122,6 +122,14 @@ RUN mkdir -p ${OUTDIR}/usr/bin && \
     strip /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust && \
     install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
 
+FROM node:8.11.3-alpine as typescript_builder
+ENV PROTOC_GEN_TYPESCRIPT_VERSION=0.7.3 \
+    PKG_VERSION=4.3.3
+RUN mkdir -p /protoc-gen-ts && \
+    cd /protoc-gen-ts && \
+    npm install -g pkg@${PKG_VERSION} && \
+    npm install --no-save ts-protoc-gen@${PROTOC_GEN_TYPESCRIPT_VERSION} && \
+    pkg --targets node8-alpine-x64 /protoc-gen-ts/node_modules/ts-protoc-gen/bin/protoc-gen-ts
 
 FROM znly/upx as packer
 COPY --from=protoc_builder /out/ /out/
@@ -140,6 +148,8 @@ RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
     done
 COPY --from=javalite_builder /protoc-gen-javalite /protoc-gen-javalite
 RUN ln -s /protoc-gen-javalite/protoc-gen-javalite /usr/bin/protoc-gen-javalite
+COPY --from=typescript_builder /protoc-gen-ts/protoc-gen-ts /protoc-gen-ts/protoc-gen-ts
+RUN ln -s /protoc-gen-ts/protoc-gen-ts /usr/bin/protoc-gen-ts
 
 RUN apk add --no-cache curl && \
     mkdir -p /protobuf/google/protobuf && \
