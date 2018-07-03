@@ -1,11 +1,11 @@
 FROM alpine:3.7 as protoc_builder
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
 
-ENV GRPC_VERSION=1.8.3 \
-    GRPC_JAVA_VERSION=1.8.0 \
-    PROTOBUF_VERSION=3.5.1 \
+ENV GRPC_VERSION=1.13.0 \
+    GRPC_JAVA_VERSION=1.13.1 \
+    PROTOBUF_VERSION=3.6.0.1 \
     PROTOBUF_C_VERSION=1.3.0 \
-    PROTOC_GEN_DOC_VERSION=1.0.0-rc \
+    PROTOC_GEN_DOC_VERSION=1.1.0 \
     OUTDIR=/out
 RUN mkdir -p /protobuf && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz --strip-components=1 -C /protobuf
@@ -29,7 +29,11 @@ RUN cd /grpc-java/compiler/src/java_plugin/cpp && \
         -L/protobuf/src/.libs \
         -lprotoc -lprotobuf -lpthread --std=c++0x -s \
         -o protoc-gen-grpc-java
+COPY 0001-Fix-build-with-protobuf-3.6.x.patch /protobuf-c
+COPY 0001-protoc-c-c_file.h-fix-build-missing-std.patch /protobuf-c
 RUN cd /protobuf-c && \
+    patch -p1 < 0001-Fix-build-with-protobuf-3.6.x.patch && \
+    patch -p1 < 0001-protoc-c-c_file.h-fix-build-missing-std.patch && \
     ./configure --prefix=/usr && \
     make -j2
 RUN cd /protobuf && \
@@ -71,12 +75,12 @@ RUN apt-get update && \
     apt-get install -y build-essential make tar xz-utils bzip2 gzip sed \
     libz-dev unzip patchelf curl libedit-dev python2.7 python2.7-dev libxml2 \
     git libxml2-dev uuid-dev libssl-dev bash patch
-ENV SWIFT_VERSION=4.0.3 \
-    LLVM_VERSION=5.0.1
+ENV SWIFT_VERSION=4.1.1 \
+    LLVM_VERSION=5.0.2
 RUN curl -L http://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-16.04.tar.xz | tar --strip-components 1 -C /usr/local/ -xJv
 RUN curl -L https://swift.org/builds/swift-${SWIFT_VERSION}-release/ubuntu1604/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-ubuntu16.04.tar.gz | tar --strip-components 1 -C / -xz
 
-ENV SWIFT_PROTOBUF_VERSION=1.0.2
+ENV SWIFT_PROTOBUF_VERSION=1.0.3
 RUN mkdir -p /swift-protobuf && \
     curl -L https://github.com/apple/swift-protobuf/archive/${SWIFT_PROTOBUF_VERSION}.tar.gz | tar --strip-components 1 -C /swift-protobuf -xz
 RUN apt-get install -y libcurl4-openssl-dev
@@ -106,6 +110,7 @@ RUN find /protoc-gen-javalite/ -name 'lib*.so*' -exec patchelf --set-rpath /prot
     for p in protoc-gen-javalite; do \
         patchelf --set-interpreter /protoc-gen-javalite/ld-linux-x86-64.so.2 --set-rpath /protoc-gen-javalite /protoc-gen-javalite/${p}; \
     done
+
 
 FROM rust:1.22.1 as rust_builder
 ENV RUST_PROTOBUF_VERSION=1.4.3 \
