@@ -14,6 +14,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
   - github.com/gogo/protobuf/protoc-gen-gogoslick
   - github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
   - github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+  - github.com/micro/protoc-gen-micro
 
 ## Supported languages
 - C

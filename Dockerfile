@@ -61,6 +61,7 @@ RUN go get -u -v -ldflags '-w -s' \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
         github.com/johanbrandhorst/protobuf/protoc-gen-gopherjs \
         github.com/ckaznocha/protoc-gen-lint \
+        github.com/micro/protoc-gen-micro \
         && install -c ${GOPATH}/bin/protoc-gen* ${OUTDIR}/usr/bin/
 
 RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
