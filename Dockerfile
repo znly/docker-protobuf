@@ -162,5 +162,3 @@ RUN apk add --no-cache curl && \
     mkdir -p /protobuf/github.com/mwitkow/go-proto-validators && \
         curl -L -o /protobuf/github.com/mwitkow/go-proto-validators/validator.proto https://raw.githubusercontent.com/mwitkow/go-proto-validators/master/validator.proto && \
     apk del curl
-
-ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
