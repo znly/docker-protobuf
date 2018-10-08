@@ -3,7 +3,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
 
 ENV GRPC_VERSION=1.13.0 \
     GRPC_JAVA_VERSION=1.13.1 \
-    PROTOBUF_VERSION=3.6.0.1 \
+    PROTOBUF_VERSION=3.6.1 \
     PROTOBUF_C_VERSION=1.3.0 \
     PROTOC_GEN_DOC_VERSION=1.1.0 \
     OUTDIR=/out
