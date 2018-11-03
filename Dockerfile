@@ -144,17 +144,17 @@ RUN upx --lzma \
         /out/usr/bin/protoc-gen-*
 
 FROM alpine:3.7
-RUN apk add --no-cache libstdc++
 COPY --from=packer /out/ /
 COPY --from=rust_builder /out/ /
 COPY --from=swift_builder /protoc-gen-swift /protoc-gen-swift
-RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
-        ln -s /protoc-gen-swift/${p} /usr/bin/${p}; \
-    done
 COPY --from=javalite_builder /protoc-gen-javalite /protoc-gen-javalite
-RUN ln -s /protoc-gen-javalite/protoc-gen-javalite /usr/bin/protoc-gen-javalite
-
-RUN apk add --no-cache curl && \
+RUN set -x \
+ && apk add --no-cache libstdc++ \
+ && for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
+        ln -s /protoc-gen-swift/${p} /usr/bin/${p}; \
+    done \
+ && ln -s /protoc-gen-javalite/protoc-gen-javalite /usr/bin/protoc-gen-javalite \
+ && apk add --no-cache curl && \
     mkdir -p /protobuf/google/protobuf && \
         for f in any duration descriptor empty struct timestamp wrappers; do \
             curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
