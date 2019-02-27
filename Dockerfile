@@ -137,6 +137,16 @@ RUN mkdir -p ${OUTDIR}/usr/bin && \
         install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
 
 
+FROM alpine:3.7 as node_builder
+ENV TS_PROTOC_GEN_VERSION=0.9.0
+RUN apk add --no-cache nodejs && \
+    npm set progress=false && \
+    npm config set depth 0 && \
+    npm install google-protobuf && \
+    npm install ts-protoc-gen@${TS_PROTOC_GEN_VERSION} && \
+    npm uninstall -g npm
+
+
 FROM znly/upx as packer
 COPY --from=protoc_builder /out/ /out/
 RUN upx --lzma \
@@ -154,6 +164,10 @@ RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
         done
 COPY --from=javalite_builder /protoc-gen-javalite /protoc-gen-javalite
 RUN ln -s /protoc-gen-javalite/protoc-gen-javalite /usr/bin/protoc-gen-javalite
+COPY --from=node_builder /node_modules /node_modules
+RUN apk add --no-cache nodejs && \
+    ln -s /node_modules/ts-protoc-gen/bin/protoc-gen-ts /usr/bin/protoc-gen-ts && \
+    npm uninstall -g npm
 
 RUN apk add --no-cache curl && \
         mkdir -p /protobuf/google/protobuf && \

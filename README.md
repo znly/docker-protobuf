@@ -32,6 +32,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
 - Go
 - Swift 4
 - Rust
+- TypeScript
 
 ## Usage
 ```
