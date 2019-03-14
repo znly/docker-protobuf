@@ -175,4 +175,8 @@ RUN apk add --no-cache curl && \
         apk del curl && \
         chmod a+x /usr/bin/protoc
 
-ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
+RUN apk update \
+    && apk add nodejs nodejs-npm \
+    && npm install -g grpc_tools_node_protoc_ts grpc-tools grpc
+
+ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-grpc=/usr/lib/node_modules/grpc_tools_node_protoc_ts/bin/protoc-gen-ts"]
