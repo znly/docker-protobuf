@@ -78,7 +78,6 @@ RUN cd ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
         make build && \
         install -c ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc/protoc-gen-doc ${OUTDIR}/usr/bin/
 
-
 FROM ubuntu:16.04 as swift_builder
 RUN apt-get update && \
         apt-get install -y build-essential make tar xz-utils bzip2 gzip sed \
@@ -136,7 +135,6 @@ RUN mkdir -p ${OUTDIR}/usr/bin && \
         strip /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust && \
         install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
 
-
 FROM znly/upx as packer
 COPY --from=protoc_builder /out/ /out/
 RUN upx --lzma \
@@ -155,7 +153,7 @@ RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
 COPY --from=javalite_builder /protoc-gen-javalite /protoc-gen-javalite
 RUN ln -s /protoc-gen-javalite/protoc-gen-javalite /usr/bin/protoc-gen-javalite
 
-RUN apk add --no-cache curl && \
+RUN apk add --no-cache curl nodejs nodejs-npm && \
         mkdir -p /protobuf/google/protobuf && \
         for f in any duration descriptor empty struct timestamp wrappers; do \
         curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
@@ -173,6 +171,7 @@ RUN apk add --no-cache curl && \
         curl -L -o /protobuf/github.com/lyft/protoc-gen-validate/gogoproto/gogo.proto https://raw.githubusercontent.com/lyft/protoc-gen-validate/master/gogoproto/gogo.proto && \
         curl -L -o /protobuf/github.com/lyft/protoc-gen-validate/validate/validate.proto https://raw.githubusercontent.com/lyft/protoc-gen-validate/master/validate/validate.proto && \
         apk del curl && \
+        npm install -g --unsafe-perm grpc_tools_node_protoc_ts grpc-tools grpc && \
         chmod a+x /usr/bin/protoc
 
 ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
