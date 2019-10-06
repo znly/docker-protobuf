@@ -136,9 +136,25 @@ RUN mkdir -p ${OUTDIR}/usr/bin && \
         strip /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust && \
         install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
 
+FROM alpine:3.10 as upx
+ENV UPX_VERSION=7a3637ff5a800b8bcbad20ae7f668d8c8449b014 \
+    LDFLAGS=-static
+RUN apk add --no-cache build-base ucl-dev zlib-dev git
+RUN git clone --depth 1 --recursive -b devel https://github.com/upx/upx.git /upx
+RUN cd /upx/src && \
+    make -j2 upx.out CHECK_WHITESPACE=
+RUN /upx/src/upx.out --lzma -o /usr/bin/upx /upx/src/upx.out
+ENTRYPOINT ["/usr/bin/upx"]
+
+FROM upx as packer	
+COPY --from=protoc_builder /out/ /out/	
+RUN upx --lzma \		
+        /out/usr/bin/grpc_* \	
+        /out/usr/bin/protoc-gen-*
+
 FROM alpine:3.10
 RUN apk add --no-cache libstdc++
-COPY --from=protoc_builder /out/ /
+COPY --from=packer /out/ /
 COPY --from=rust_builder /out/ /
 COPY --from=swift_builder /protoc-gen-swift /protoc-gen-swift
 RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
